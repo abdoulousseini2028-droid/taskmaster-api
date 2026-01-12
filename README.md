@@ -2,6 +2,9 @@
 
 REST API for task management built with Go, PostgreSQL, and Docker.
 
+<img width="731" height="367" alt="Screenshot 2026-01-11 at 21 56 44" src="https://github.com/user-attachments/assets/dbe61acd-0d0e-4f54-a40e-5e1624b6d03e" />
+
+
 ## Quick Start
 ```bash
 # 1. Clone
