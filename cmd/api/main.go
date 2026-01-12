@@ -60,6 +60,25 @@ func setupRouter(taskHandler *handlers.TaskHandler, cfg *config.Config) *gin.Eng
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router := gin.Default()
+	
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "TaskMaster API",
+			"version": "1.0.0",
+			"endpoints": gin.H{
+				"health": "/health",
+				"tasks": gin.H{
+					"list":   "GET /api/v1/tasks",
+					"create": "POST /api/v1/tasks",
+					"get":    "GET /api/v1/tasks/:id",
+					"update": "PUT /api/v1/tasks/:id",
+					"delete": "DELETE /api/v1/tasks/:id",
+				},
+			},
+			"documentation": "https://github.com/abdoulousseini2028-droid/taskmaster-api",
+		})
+	})
+	
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "healthy",
