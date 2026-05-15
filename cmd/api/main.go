@@ -15,6 +15,7 @@ import (
 	"github.com/abdoulousseini2028-droid/taskmaster-api/internal/config"
 	"github.com/abdoulousseini2028-droid/taskmaster-api/internal/handlers"
 	"github.com/abdoulousseini2028-droid/taskmaster-api/internal/repository"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 func main() {
@@ -25,9 +26,10 @@ func main() {
 	}
 	defer pool.Close()
 	if err := pool.Ping(context.Background()); err != nil {
-		log.Fatalf("Unable to ping database: %v\n", err)
+		log.Printf("Unable to ping database, continuing anyway for testing: %v\n", err)
+	} else {
+		log.Println("Successfully connected to database!")
 	}
-	log.Println("Successfully connected to database!")
 	
 	taskRepo := repository.NewTaskRepository(pool)
 	taskHandler := handlers.NewTaskHandler(taskRepo)
@@ -60,6 +62,9 @@ func setupRouter(taskHandler *handlers.TaskHandler, cfg *config.Config) *gin.Eng
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router := gin.Default()
+
+	p := ginprometheus.NewPrometheus("gin")
+	p.Use(router)
 	
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

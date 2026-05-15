@@ -1,0 +1,25 @@
+replicaCount: 2
+
+image:
+  repository: task-api
+  pullPolicy: IfNotPresent
+  tag: "local"
+
+env:
+  DATABASE_URL: "postgres://postgres:postgres@localhost:5432/taskmaster?sslmode=disable"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+deployment:
+  containerPort: 8080
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
