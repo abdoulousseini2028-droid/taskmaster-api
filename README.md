@@ -97,6 +97,64 @@ The API follows clean architecture principles with clear separation between HTTP
 - Docker containerization for consistent deployment
 - PostgreSQL for reliable data persistence
 - Health check endpoint for monitoring
+- **CI/CD Pipeline**: Automated testing, building, and Docker image publishing via GitHub Actions
+- **Kubernetes Ready**: Complete Kubernetes deployment manifests for scalable production deployment
+
+## CI/CD & Deployment
+
+### GitHub Actions Pipeline
+
+Automated CI/CD pipeline configured in `.github/workflows/ci.yml`:
+- **Continuous Integration**: Runs on every push and pull request
+  - Go static analysis (`go vet`)
+  - Unit tests with race condition detection (`go test -race`)
+  - Docker image build and push to Docker Hub
+- **Continuous Deployment**: Runs on successful CI completion for main branch
+  - Ready for automated deployment to Kubernetes
+
+**Required Secrets** (GitHub Settings → Secrets):
+- `DOCKER_USERNAME`: Docker Hub username
+- `DOCKER_PASSWORD`: Docker Hub personal access token
+
+### Kubernetes Deployment
+
+Production-grade Kubernetes manifests in `k8s/`:
+
+**Deployment** (`k8s/deployment.yaml`):
+- 2 replicas for high availability
+- Auto-scaling ready (liveness & readiness probes)
+- Database connection via ConfigMap/Secret
+- Resource limits (CPU: 100m-500m, Memory: 128Mi-512Mi)
+- Health check probes at `/health` endpoint
+
+**Service** (`k8s/service.yaml`):
+- ClusterIP service exposing port 80 → 8080
+- Load balancing across replicas
+
+### Quick Kubernetes Deploy
+
+```bash
+# 1. Create database secret
+kubectl create secret generic task-api-secrets \
+  --from-literal=database-url='postgres://user:pass@db:5432/taskdb?sslmode=disable'
+
+# 2. Update image in k8s/deployment.yaml
+sed -i 's/YOUR_DOCKER_USERNAME/your-username/' k8s/deployment.yaml
+
+# 3. Apply manifests
+kubectl apply -f k8s/
+
+# 4. Verify deployment
+kubectl rollout status deployment/task-api
+kubectl get pods -l app=task-api
+
+# 5. Test locally
+kubectl port-forward svc/task-api 8080:80
+curl http://localhost:8080/health
+```
+
+See [CICD_SETUP.md](CICD_SETUP.md) for detailed setup instructions.
+See [deploy.sh](deploy.sh) for deployment verification guide.
 
 ## Development
 
